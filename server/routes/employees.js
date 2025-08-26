@@ -32,20 +32,6 @@ module.exports = (con) => {
   });
 
   router.get("/", (req, res) => {
-    con.query("SELECT * FROM department", (err, result) => {
-      if (err) return res.status(500).send(err);
-      res.send(result.rows.map((r) => r.name));
-    });
-  });
-
-  router.get("/employments", (req, res) => {
-    con.query("SELECT * FROM employment", (err, result) => {
-      if (err) return res.status(500).send(err);
-      res.send(result.rows.map((r) => r.name));
-    });
-  });
-
-  router.get("/", (req, res) => {
     con.query("SELECT * FROM employees", (err, result) => {
       if (err) return res.status(500).send(err);
       res.send(result.rows);

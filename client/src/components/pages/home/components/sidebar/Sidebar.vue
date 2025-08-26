@@ -9,20 +9,14 @@ const activeDepartment = ref<string>("All");
 
 const getFilters = async () => {
   try {
-    const employmentResponse = await fetch(
-      "http://localhost:3000/fetchEmployment",
-      {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-    const departmentResponse = await fetch(
-      "http://localhost:3000/fetchDepartment",
-      {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    const employmentResponse = await fetch("http://localhost:3000/employment", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    const departmentResponse = await fetch("http://localhost:3000/department", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
     const employmentResult = await employmentResponse.json();
     const departmentResult = await departmentResponse.json();
     employmentFilters.value = ["All", ...employmentResult];
