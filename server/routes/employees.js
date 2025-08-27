@@ -31,11 +31,29 @@ module.exports = (con) => {
     );
   });
 
-  router.get("/", (req, res) => {
-    con.query("SELECT * FROM employees", (err, result) => {
-      if (err) return res.status(500).send(err);
-      res.send(result.rows);
-    });
+  router.get("/", async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    try {
+      const total = await con.query("SELECT COUNT(*) FROM employees");
+      const result = await con.query(
+        "SELECT * FROM employees ORDER BY id LIMIT $1 OFFSET $2",
+        [limit, offset]
+      );
+
+      res.json({
+        page,
+        limit,
+        total: parseInt(total.rows[0].count),
+        totalPages: Math.ceil(total.rows[0].count / limit),
+        data: result.rows,
+      });
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).json({ error: "Server error" });
+    }
   });
 
   return router;

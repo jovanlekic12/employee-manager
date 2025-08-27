@@ -1,8 +1,16 @@
 <script setup lang="ts">
-import type { Employee } from "client/src/utils/types";
-import { onMounted, ref } from "vue";
+import type { Employee } from "@/utils/types";
 import { IpEdit } from "vue-icons-plus/ip";
-const employees = ref<Employee[]>([]);
+import Pagination from "./pagination/Pagination.vue";
+type Props = {
+  employees: Employee[];
+  total: number;
+  limit: number;
+  page: number;
+};
+
+const props = defineProps<Props>();
+
 const employeeInfos: string[] = [
   "Full Name",
   "Address",
@@ -12,36 +20,26 @@ const employeeInfos: string[] = [
   "Training",
   "Actions",
 ];
-
-const getEmployees = async () => {
-  try {
-    const response = await fetch("http://localhost:3000/employees", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
-    const result = await response.json();
-    employees.value = result;
-  } catch (err) {
-    console.error(err);
-  }
-};
-onMounted(() => {
-  getEmployees();
-});
+const emit = defineEmits<{
+  (e: "update:page", value: number): void;
+  (e: "update:limit", value: number): void;
+}>();
 </script>
 
 <template>
   <section>
-    <header class="grid grid-cols-[1fr_1fr_1fr_1fr_.5fr_.5fr_.5fr] gap-4">
+    <header
+      class="grid grid-cols-[1fr_1fr_1fr_1fr_.5fr_.5fr_.5fr] justify-items-center"
+    >
       <h6 v-for="info in employeeInfos" class="font-bold text-gray-800">
         {{ info }}
       </h6>
     </header>
     <ul class="flex flex-col gap-3 mt-3">
       <li
-        v-for="employee in employees"
+        v-for="employee in props.employees"
         :key="`employe-${employee.id}`"
-        class="grid grid-cols-[1fr_1fr_1fr_1fr_.5fr_.5fr_.5fr] border-b-1 border-b-gray-300 pb-3"
+        class="grid grid-cols-[1fr_1fr_1fr_1fr_.5fr_.5fr_.5fr] justify-items-center border-b-1 border-b-gray-300 pb-3"
       >
         <p class="text-md font-medium text-gray-700">
           {{ employee.full_name }}
@@ -75,5 +73,12 @@ onMounted(() => {
         </button>
       </li>
     </ul>
+    <Pagination
+      :page="props.page"
+      :limit="props.limit"
+      :total="props.total"
+      @update:page="$emit('update:page', $event)"
+      @update:limit="$emit('update:limit', $event)"
+    />
   </section>
 </template>
