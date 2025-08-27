@@ -27,7 +27,9 @@ const emit = defineEmits<{
             console.log(props.limit)
         "
       >
-        <option v-for="option in options" :key="option">{{ option }}</option>
+        <option class="bg-blue-400" v-for="option in options" :key="option">
+          {{ option }}
+        </option>
       </select>
     </div>
     <div class="flex items-center gap-2">

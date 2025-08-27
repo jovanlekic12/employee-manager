@@ -35,12 +35,60 @@ module.exports = (con) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
+    const search = req.query.search ? `%${req.query.search}%` : null;
+    const sort = req.query.sort;
+    const employment =
+      req.query.employment && req.query.employment !== "All"
+        ? req.query.employment
+        : null;
+    const department =
+      req.query.department && req.query.department !== "All"
+        ? req.query.department
+        : null;
+
+    const sortMap = {
+      "name-asc": "full_name ASC",
+      "name-desc": "full_name DESC",
+      "date-asc": "start_date ASC",
+      "date-desc": "start_date DESC",
+      "training-asc": "training ASC",
+      "training-desc": "training DESC",
+    };
+    const orderBy = sortMap[sort];
 
     try {
-      const total = await con.query("SELECT COUNT(*) FROM employees");
+      let whereClauses = [];
+      let params = [];
+      let paramIndex = 1;
+
+      if (search) {
+        whereClauses.push(`full_name ILIKE $${paramIndex++}`);
+        params.push(search);
+      }
+
+      if (employment) {
+        whereClauses.push(`employment = $${paramIndex++}`);
+        params.push(employment);
+      }
+
+      if (department) {
+        whereClauses.push(`department = $${paramIndex++}`);
+        params.push(department);
+      }
+
+      const whereSQL = whereClauses.length
+        ? `WHERE ${whereClauses.join(" AND ")}`
+        : "";
+
+      const total = await con.query(
+        `SELECT COUNT(*) FROM employees ${whereSQL}`,
+        params
+      );
+
+      params.push(limit, offset);
       const result = await con.query(
-        "SELECT * FROM employees ORDER BY id LIMIT $1 OFFSET $2",
-        [limit, offset]
+        `SELECT * FROM employees ${whereSQL} ORDER BY ${orderBy} LIMIT $${paramIndex++} OFFSET $${paramIndex++}`,
+        params
       );
 
       res.json({

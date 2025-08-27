@@ -1,12 +1,20 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 
+type Props = {
+  activeDepartment: string;
+  activeEmployment: string;
+};
+
+const props = defineProps<Props>();
+
 const employmentFilters = ref<string[]>([]);
 const departmentFilters = ref<string[]>([]);
 
-const activeEmployment = ref<string>("All");
-const activeDepartment = ref<string>("All");
-
+const emit = defineEmits<{
+  (e: "update:activeEmployment", value: string): void;
+  (e: "update:activeDepartment", value: string): void;
+}>();
 const getFilters = async () => {
   try {
     const employmentResponse = await fetch("http://localhost:3000/employment", {
@@ -37,10 +45,11 @@ onMounted(() => {
       <div class="grid grid-cols-2 gap-2 pt-2">
         <button
           v-for="filter in departmentFilters"
-          @click="activeDepartment = filter"
-          :class="`py-1 rounded-xl font-medium cursor-pointer duration-200 ${
-            activeDepartment === filter && 'bg-blue-400 text-white'
-          }`"
+          @click="emit('update:activeDepartment', filter)"
+          :class="[
+            'py-1 rounded-xl font-medium cursor-pointer duration-200',
+            props.activeDepartment === filter ? 'bg-blue-400 text-white' : '',
+          ]"
         >
           {{ filter }}
         </button>
@@ -51,10 +60,11 @@ onMounted(() => {
       <div class="grid grid-cols-2 gap-2 pt-2">
         <button
           v-for="filter in employmentFilters"
-          @click="activeEmployment = filter"
-          :class="`py-1 rounded-xl font-medium cursor-pointer duration-200 ${
-            activeEmployment === filter && 'bg-blue-400 text-white'
-          }`"
+          @click="emit('update:activeEmployment', filter)"
+          :class="[
+            'py-1 rounded-xl font-medium cursor-pointer duration-200',
+            props.activeEmployment === filter ? 'bg-blue-400 text-white' : '',
+          ]"
         >
           {{ filter }}
         </button>

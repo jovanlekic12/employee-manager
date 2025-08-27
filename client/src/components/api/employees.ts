@@ -7,14 +7,26 @@ type EmployeesResponse = {
 
 const getEmployees = async (
   page: number,
-  limit: number
+  limit: number,
+  search: string,
+  sort: string,
+  employment: string,
+  department: string
 ): Promise<EmployeesResponse> => {
   let data: Employee[] = [];
   let count = 0;
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+    search,
+    sort,
+    employment,
+    department,
+  });
 
   try {
     const response = await fetch(
-      `http://localhost:3000/employees?page=${page}&limit=${limit}`,
+      `http://localhost:3000/employees?${params.toString()}`,
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
