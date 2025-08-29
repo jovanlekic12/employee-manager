@@ -1,4 +1,5 @@
 import type { Employee } from "@/utils/types";
+import apiClient from "./apiClient";
 
 type EmployeesResponse = {
   data: Employee[];
@@ -13,33 +14,26 @@ const getEmployees = async (
   employment: string,
   department: string
 ): Promise<EmployeesResponse> => {
-  let data: Employee[] = [];
-  let count = 0;
-  const params = new URLSearchParams({
-    page: String(page),
-    limit: String(limit),
-    search,
-    sort,
-    employment,
-    department,
-  });
-
   try {
-    const response = await fetch(
-      `http://localhost:3000/employees?${params.toString()}`,
-      {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-    const result = await response.json();
-    data = result.data;
-    count = result.total;
-  } catch (err) {
-    console.error(err);
-  }
+    const response = await apiClient.get("/employees", {
+      params: {
+        page,
+        limit,
+        search,
+        sort,
+        employment,
+        department,
+      },
+    });
 
-  return { data, count };
+    return {
+      data: response.data.data as Employee[],
+      count: response.data.total as number,
+    };
+  } catch (error) {
+    console.error("Error fetching employees:", error);
+    return { data: [], count: 0 };
+  }
 };
 
 export default getEmployees;

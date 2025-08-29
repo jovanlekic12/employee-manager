@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import apiClient from "@/components/api/apiClient";
 import { onMounted, ref } from "vue";
 
 type Props = {
@@ -15,24 +16,21 @@ const emit = defineEmits<{
   (e: "update:activeEmployment", value: string): void;
   (e: "update:activeDepartment", value: string): void;
 }>();
+
 const getFilters = async () => {
   try {
-    const employmentResponse = await fetch("http://localhost:3000/employment", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
-    const departmentResponse = await fetch("http://localhost:3000/department", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
-    const employmentResult = await employmentResponse.json();
-    const departmentResult = await departmentResponse.json();
-    employmentFilters.value = ["All", ...employmentResult];
-    departmentFilters.value = ["All", ...departmentResult];
+    const [employmentResponse, departmentResponse] = await Promise.all([
+      apiClient.get("/employment"),
+      apiClient.get("/department"),
+    ]);
+
+    employmentFilters.value = ["All", ...employmentResponse.data.data];
+    departmentFilters.value = ["All", ...departmentResponse.data.data];
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching filters:", error);
   }
 };
+
 onMounted(() => {
   getFilters();
 });

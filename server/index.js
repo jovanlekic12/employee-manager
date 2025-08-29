@@ -1,7 +1,8 @@
-const { Client } = require("pg");
-const cors = require("cors");
-const express = require("express");
-
+import { Client } from "pg";
+import cors from "cors";
+import express from "express";
+import employeesRoute from "./routes/employees.js";
+import categoriesRoute from "./routes/categories.js";
 const app = express();
 
 app.use(cors({ origin: "http://localhost:5173" }));
@@ -19,9 +20,7 @@ con.connect().then(() => console.log("connected"));
 
 app.listen(3000);
 
-const employeesRoute = require("./routes/employees")(con);
-const categoriesRoute = require("./routes/categories")(con);
 app.use("/employees", employeesRoute);
 app.use("/", categoriesRoute);
 
-module.exports = con;
+export default con;
