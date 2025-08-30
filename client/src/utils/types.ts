@@ -6,4 +6,5 @@ export type Employee = {
   employment: string;
   department: string;
   training: boolean;
+  isEditing?: boolean;
 };

@@ -1,6 +1,6 @@
 import express from "express";
 import con from "../index.js";
-
+import { errorFactory, responseFactory } from "../utils/helpers.js";
 const router = express.Router();
 
 router.post("/", (req, res) => {
@@ -100,7 +100,46 @@ router.get("/", async (req, res) => {
     });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({ error: "Server error" });
+    errorFactory.serverError();
+  }
+});
+
+router.put("/:id", async (req, res) => {
+  const { id } = req.params;
+  const { full_name, adress, start_date, employment, department, training } =
+    req.body;
+
+  try {
+    const update_query = `
+      UPDATE employees
+      SET full_name = $1,
+          adress = $2,
+          start_date = $3,
+          employment = $4,
+          department = $5,
+          training = $6
+      WHERE id = $7
+      RETURNING *;
+    `;
+
+    const result = await con.query(update_query, [
+      full_name,
+      adress,
+      start_date,
+      employment,
+      department,
+      training,
+      id,
+    ]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
+    res.json({ message: "Employee updated", employee: result.rows[0] });
+  } catch (error) {
+    console.error(error.message);
+    errorFactory.serverError();
   }
 });
 

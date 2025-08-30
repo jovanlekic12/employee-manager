@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { BiSolidChevronLeft, BiSolidChevronRight } from "vue-icons-plus/bi";
-
+import Button from "@/components/Button.vue";
 type Props = {
   total: number;
   limit: number;
@@ -41,20 +41,20 @@ const emit = defineEmits<{
         of {{ props.total }}
       </h3>
       <div class="flex items-center gap-1">
-        <button
-          class="cursor-pointer"
+        <Button
+          type="ghost"
           @click="emit('update:page', props.page - 1)"
           :disabled="props.page <= 1"
         >
           <BiSolidChevronLeft />
-        </button>
-        <button
-          class="cursor-pointer"
+        </Button>
+        <Button
+          type="ghost"
           @click="emit('update:page', props.page + 1)"
           :disabled="props.page * props.limit >= props.total"
         >
           <BiSolidChevronRight />
-        </button>
+        </Button>
       </div>
     </div>
   </footer>
