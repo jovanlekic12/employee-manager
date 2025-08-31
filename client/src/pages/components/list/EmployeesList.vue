@@ -27,6 +27,7 @@ const emit = defineEmits<{
   (e: "update:page", value: number): void;
   (e: "update:limit", value: number): void;
   (e: "toggle-edit", id: string): void;
+  (e: "submit-edit", employee: Employee): void;
 }>();
 </script>
 
@@ -46,6 +47,8 @@ const emit = defineEmits<{
           :employee="employee"
           :employmentFilters="employmentFilters"
           :departmentFilters="departmentFilters"
+          @toggle-edit="emit('toggle-edit', $event)"
+          @submit-edit="emit('submit-edit', $event)"
         />
         <ListItem
           v-else

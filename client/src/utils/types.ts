@@ -8,3 +8,13 @@ export type Employee = {
   training: boolean;
   isEditing?: boolean;
 };
+export type ValidationError = {
+  msg: string;
+  path: string;
+  location: string;
+  value?: any;
+};
+
+export type ValidationErrorResponse = {
+  errors: ValidationError[];
+};

@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import getEmployees from "@/api/employees";
+import { getEmployees } from "@/api/employees";
 import apiClient from "@/api/apiClient";
 import type { Employee } from "@/utils/types";
 import { onMounted, ref, watch } from "vue";
 import Header from "./components/header/Header.vue";
 import Sidebar from "./components/sidebar/Sidebar.vue";
 import EmployeesList from "./components/list/EmployeesList.vue";
+import Overlay from "@/components/Overlay.vue";
+import Button from "@/components/Button.vue";
+import NewEmployeeForm from "./components/form/NewEmployeeForm.vue";
 
 const page = ref(1);
 const limit = ref(6);
@@ -15,6 +18,7 @@ const searchQuery = ref("");
 const employees = ref<Employee[]>([]);
 const selectEmployment = ref<string[]>([]);
 const selectDepartment = ref<string[]>([]);
+const isFormOpened = ref<boolean>(false);
 
 const activeEmployment = ref<string>("All");
 const activeDepartment = ref<string>("All");
@@ -59,6 +63,24 @@ const handleEditing = (id: string) => {
   );
 };
 
+const closeForm = () => {
+  isFormOpened.value = false;
+};
+
+const handleAddEmployee = (newEmployee: Employee) => {
+  employees.value.push(newEmployee);
+  closeForm();
+  total.value += 1;
+};
+
+const handleSubmitEdit = (newEmployee: Employee) => {
+  employees.value = employees.value.map((employee) =>
+    employee.id === newEmployee.id
+      ? { ...employee, ...newEmployee, isEditing: false }
+      : employee
+  );
+};
+
 onMounted(() => {
   fetchEmployees();
   fetchFilters();
@@ -75,6 +97,7 @@ watch(
     <header class="w-full text-center py-5">
       <h1 class="text-4xl font-semibold text-gray-900">Employee Manager</h1>
     </header>
+    <Button type="primary" @click="isFormOpened = true">Add employee</Button>
     <Header
       v-model:searchQuery="searchQuery"
       :total="total"
@@ -97,7 +120,17 @@ watch(
         v-model:page="page"
         v-model:limit="limit"
         @toggle-edit="handleEditing"
+        @submit-edit="handleSubmitEdit"
       />
     </main>
   </section>
+  <teleport to="body" v-if="isFormOpened">
+    <Overlay />
+    <NewEmployeeForm
+      :employmentFilters="selectEmployment"
+      :departmentFilters="selectDepartment"
+      @submit-employee="handleAddEmployee"
+      @close-form="closeForm"
+    />
+  </teleport>
 </template>

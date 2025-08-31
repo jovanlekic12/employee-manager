@@ -15,7 +15,7 @@ const props = defineProps<ButtonProps>();
 const emit = defineEmits<{ (e: "click", event: MouseEvent): void }>();
 
 const base =
-  "cursor-pointer sm:text-md text-sm bg-blue-400 font-semibold uppercase tracking-wide text-white transition-colors duration-300 hover:bg-purple-600 disabled:cursor-not-allowed disabled:bg-white disabled:border disabled:border-yellow-400";
+  "cursor-pointer sm:text-md text-sm bg-blue-400 font-semibold uppercase tracking-wide text-white transition-colors duration-300 hover:bg-blue-600 disabled:cursor-not-allowed";
 
 const classes = computed(() => {
   const map: Record<ButtonType, string> = {

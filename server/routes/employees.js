@@ -1,9 +1,17 @@
 import express from "express";
 import con from "../index.js";
-import { errorFactory, responseFactory } from "../utils/helpers.js";
+import { errorFactory } from "../utils/helpers.js";
+import { validationResult, body, checkSchema } from "express-validator";
+import { employeeValidationSchema } from "../validation/EmployeeValidationSchema.js";
+
 const router = express.Router();
 
-router.post("/", (req, res) => {
+router.post("/", checkSchema(employeeValidationSchema), (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const {
     id,
     full_name,
@@ -23,9 +31,20 @@ router.post("/", (req, res) => {
     (err, result) => {
       if (err) {
         console.log(err);
-        res.status(500).send(err);
+        res.status(500).json({ message: "Database insert failed" });
       } else {
-        res.send("posted");
+        res.status(201).json({
+          message: "Employee created",
+          employee: {
+            id,
+            full_name,
+            adress,
+            start_date,
+            employment,
+            department,
+            training,
+          },
+        });
       }
     }
   );
@@ -104,23 +123,28 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", checkSchema(employeeValidationSchema), async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const { id } = req.params;
   const { full_name, adress, start_date, employment, department, training } =
     req.body;
 
   try {
     const update_query = `
-      UPDATE employees
-      SET full_name = $1,
-          adress = $2,
-          start_date = $3,
-          employment = $4,
-          department = $5,
-          training = $6
-      WHERE id = $7
-      RETURNING *;
-    `;
+        UPDATE employees
+        SET full_name = $1,
+            adress = $2,
+            start_date = $3,
+            employment = $4,
+            department = $5,
+            training = $6
+        WHERE id = $7
+        RETURNING *;
+      `;
 
     const result = await con.query(update_query, [
       full_name,
@@ -132,15 +156,27 @@ router.put("/:id", async (req, res) => {
       id,
     ]);
 
+    res.json({ message: "Employee updated", employee: result.rows[0] });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const delete_query = "DELETE FROM employees WHERE id = $1 RETURNING *";
+    const result = await con.query(delete_query, [id]);
+
     if (result.rowCount === 0) {
       return res.status(404).json({ message: "Employee not found" });
     }
 
-    res.json({ message: "Employee updated", employee: result.rows[0] });
+    res.json({ message: "Employee deleted", employee: result.rows[0] });
   } catch (error) {
     console.error(error.message);
-    errorFactory.serverError();
+    res.status(500).json({ error: "Server error" });
   }
 });
-
 export default router;
