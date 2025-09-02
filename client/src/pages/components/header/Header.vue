@@ -1,15 +1,20 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
-
+import Button from "@/components/Button.vue";
+import { useMediaQuery } from "@vueuse/core";
+import { FaBars } from "vue-icons-plus/fa";
 type Props = {
   total: number;
+  isSidebarOpened: boolean;
 };
 
 const props = defineProps<Props>();
+const isSmallScreen = useMediaQuery("(max-width: 1280px)");
 
 const emit = defineEmits<{
   (e: "update:searchQuery", value: string): void;
   (e: "update:sort", value: string): void;
+  (e: "open-sidebar"): void;
 }>();
 
 const searchQuery = ref("");
@@ -36,19 +41,22 @@ const sorts = [
 <template>
   <header class="flex items-center justify-between px-2 py-3 mb-2">
     <div class="flex items-center gap-3">
+      <Button v-if="isSmallScreen" type="primary" @click="emit('open-sidebar')"
+        ><FaBars
+      /></Button>
       <h3 class="text-lg font-medium">Found {{ props.total }} employees</h3>
       <input
         v-model="searchQuery"
         type="text"
         placeholder="Search..."
-        class="border-1 px-1 py-1 min-w-sm rounded-md"
+        class="border-1 px-1 py-1 xl:min-w-sm rounded-md"
       />
     </div>
     <div class="flex items-center gap-2">
       <label for="sort">Sort by:</label>
       <select
         name="sort"
-        class="border-1 px-1 py-1 min-w-sm rounded-md"
+        class="border-1 px-1 py-1 xl:min-w-sm rounded-md"
         @change="
           emit('update:sort', ($event.target as HTMLSelectElement).value)
         "

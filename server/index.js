@@ -1,12 +1,10 @@
-import { Client } from "pg";
-import cors from "cors";
 import express from "express";
-import employeesRoute from "./routes/employees.js";
-import categoriesRoute from "./routes/categories.js";
-const app = express();
+import cors from "cors";
+import apiRouter from "./router/Index.js";
 
-app.use(cors({ origin: "http://localhost:5173" }));
-app.use(express.json());
+import { Client } from "pg";
+
+const app = express();
 
 const con = new Client({
   host: "localhost",
@@ -16,11 +14,12 @@ const con = new Client({
   database: "employees",
 });
 
-con.connect().then(() => console.log("connected"));
-
-app.listen(3000);
-
-app.use("/employees", employeesRoute);
-app.use("/", categoriesRoute);
-
+con.connect().then(() => console.log("Postgres connected"));
 export default con;
+
+app.use(cors({ origin: "http://localhost:5173" }));
+app.use(express.json());
+
+app.use("/api", apiRouter);
+
+app.listen(3000, () => console.log("Server running on port 3000"));

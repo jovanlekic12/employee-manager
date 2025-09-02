@@ -54,5 +54,5 @@ export const deleteEmployee = async (id: string) => {
 export const addEmployee = async (
   employee: Employee
 ): Promise<AxiosResponse<{ message: string; employee: Employee }>> => {
-  return apiClient.post("/employees", employee); // ✅ POST instead of PUT
+  return apiClient.post("/employees", employee);
 };

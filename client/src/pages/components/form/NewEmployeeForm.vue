@@ -31,7 +31,7 @@ const emits = defineEmits<{
 const errors = ref<Record<string, string>>({});
 
 const handleSubmit = async (): Promise<void> => {
-  errors.value = {}; // reset errors
+  errors.value = {};
 
   try {
     const response = await addEmployee(newEmployee.value);
@@ -41,7 +41,6 @@ const handleSubmit = async (): Promise<void> => {
   } catch (err) {
     const axiosErr = err as AxiosError<ValidationErrorResponse>;
     if (axiosErr.response?.data?.errors) {
-      // Map backend errors using `path`
       axiosErr.response.data.errors.forEach((e) => {
         errors.value[e.path] = e.msg;
       });
@@ -49,8 +48,6 @@ const handleSubmit = async (): Promise<void> => {
       console.error("Unexpected error:", err);
     }
   }
-
-  console.log(errors.value); // now this will show the field errors
 };
 </script>
 

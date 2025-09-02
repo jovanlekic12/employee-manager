@@ -19,6 +19,7 @@ const employees = ref<Employee[]>([]);
 const selectEmployment = ref<string[]>([]);
 const selectDepartment = ref<string[]>([]);
 const isFormOpened = ref<boolean>(false);
+const isSidebarOpened = ref<boolean>(false);
 
 const activeEmployment = ref<string>("All");
 const activeDepartment = ref<string>("All");
@@ -43,8 +44,8 @@ const fetchEmployees = async () => {
 const fetchFilters = async () => {
   try {
     const [employmentResponse, departmentResponse] = await Promise.all([
-      apiClient.get("/employment"),
-      apiClient.get("/department"),
+      apiClient.get("/categories/employment"),
+      apiClient.get("/categories/department"),
     ]);
     employmentFilters.value = ["All", ...employmentResponse.data.data];
     departmentFilters.value = ["All", ...departmentResponse.data.data];
@@ -67,6 +68,13 @@ const closeForm = () => {
   isFormOpened.value = false;
 };
 
+const closeSidebar = () => {
+  isSidebarOpened.value = false;
+};
+const openSidebar = () => {
+  isSidebarOpened.value = true;
+};
+
 const handleAddEmployee = (newEmployee: Employee) => {
   employees.value.push(newEmployee);
   closeForm();
@@ -81,6 +89,10 @@ const handleSubmitEdit = (newEmployee: Employee) => {
   );
 };
 
+const deleteEmployee = (id: string) => {
+  employees.value = employees.value.filter((employee) => id !== employee.id);
+};
+
 onMounted(() => {
   fetchEmployees();
   fetchFilters();
@@ -93,7 +105,7 @@ watch(
 </script>
 
 <template>
-  <section class="max-w-7xl m-10 mx-auto">
+  <section class="max-w-7xl m-10 mx-auto px-2">
     <header class="w-full text-center py-5">
       <h1 class="text-4xl font-semibold text-gray-900">Employee Manager</h1>
     </header>
@@ -102,6 +114,8 @@ watch(
       v-model:searchQuery="searchQuery"
       :total="total"
       v-model:sort="sort"
+      :isSidebarOpened="isSidebarOpened"
+      @open-sidebar="openSidebar"
     />
     <main
       class="flex flex-col gap-10 px-5 xl:grid xl:grid-cols-[300px_minmax(900px,_1fr)]"
@@ -111,6 +125,8 @@ watch(
         :departmentFilters="departmentFilters"
         v-model:activeEmployment="activeEmployment"
         v-model:activeDepartment="activeDepartment"
+        :isSidebarOpened="isSidebarOpened"
+        @close-sidebar="closeSidebar"
       />
       <EmployeesList
         :employmentFilters="selectEmployment"
@@ -121,6 +137,7 @@ watch(
         v-model:limit="limit"
         @toggle-edit="handleEditing"
         @submit-edit="handleSubmitEdit"
+        @delete-employee="deleteEmployee"
       />
     </main>
   </section>

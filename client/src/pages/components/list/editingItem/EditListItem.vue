@@ -7,11 +7,20 @@ import { editEmployee } from "@/api/employees";
 import type { AxiosError } from "axios";
 import Overlay from "@/components/Overlay.vue";
 import { ImCross } from "vue-icons-plus/im";
+import DeleteModal from "@/components/DeleteModal.vue";
+import { useMediaQuery } from "@vueuse/core";
 
 type Props = {
   departmentFilters: string[];
   employmentFilters: string[];
   employee: Employee;
+};
+const errors = ref<Record<string, string>>({});
+const isModalOpened = ref(false);
+const isSmallScreen = useMediaQuery("(max-width: 850px)");
+
+const closeModal = () => {
+  isModalOpened.value = false;
 };
 
 const props = defineProps<Props>();
@@ -19,9 +28,9 @@ const props = defineProps<Props>();
 const emits = defineEmits<{
   (e: "submit-edit", employee: Employee): void;
   (e: "toggle-edit", id: string): void;
+  (e: "delete-employee", id: string): void;
 }>();
 
-// Normalize date for input[type="date"]
 function normalizeDate(d: string | null) {
   if (!d) return "";
   return d.length > 10 ? d.substring(0, 10) : d;
@@ -34,11 +43,8 @@ const editedEmployee = ref({
   start_date: normalizeDate(props.employee.start_date),
 });
 
-const errors = ref<Record<string, string>>({});
-const isModalOpened = ref(false);
-
 const handleSubmit = async () => {
-  errors.value = {}; // reset errors
+  errors.value = {};
 
   try {
     await editEmployee(editedEmployee.value);
@@ -46,7 +52,6 @@ const handleSubmit = async () => {
   } catch (err) {
     const axiosErr = err as AxiosError<ValidationErrorResponse>;
     if (axiosErr.response?.data?.errors) {
-      // Map backend validation errors
       axiosErr.response.data.errors.forEach((e) => {
         errors.value[e.path] = e.msg;
       });
@@ -60,7 +65,12 @@ const handleSubmit = async () => {
 <template>
   <form
     @submit.prevent="handleSubmit"
-    class="relative grid grid-cols-[1fr_1fr_1fr_1fr_.5fr_.5fr_.5fr] justify-items-center border-b-1 border-b-gray-300 pb-3 pt-5 gap-1"
+    :class="[
+      isSmallScreen
+        ? 'flex flex-col items-start justify-start'
+        : 'grid grid-cols-[1fr_1fr_1fr_1fr_0.5fr_0.5fr_0.5fr] justify-items-center',
+      'relative border-b border-gray-300 pb-3 pt-5 gap-1',
+    ]"
   >
     <div class="flex flex-col align-center justify-start">
       <input
@@ -145,7 +155,13 @@ const handleSubmit = async () => {
       <ImCross class="w-3 h-3 text-blue-400" />
     </Button>
   </form>
-  <teleport to="body">
-    <Overlay v-if="isModalOpened" />
+  <teleport to="body" v-if="isModalOpened">
+    <Overlay />
+    <DeleteModal
+      :employee="editedEmployee.full_name"
+      :id="editedEmployee.id"
+      @close-modal="closeModal"
+      @delete-employee="emits('delete-employee', $event)"
+    />
   </teleport>
 </template>

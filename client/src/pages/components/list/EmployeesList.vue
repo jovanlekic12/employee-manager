@@ -3,6 +3,7 @@ import type { Employee } from "@/utils/types";
 import Pagination from "./pagination/Pagination.vue";
 import ListItem from "./item/ListItem.vue";
 import EditListItem from "./editingItem/EditListItem.vue";
+import { useMediaQuery } from "@vueuse/core";
 type Props = {
   departmentFilters: string[];
   employmentFilters: string[];
@@ -11,6 +12,8 @@ type Props = {
   limit: number;
   page: number;
 };
+
+const isSmallScreen = useMediaQuery("(max-width: 850px)");
 
 const props = defineProps<Props>();
 
@@ -28,12 +31,14 @@ const emit = defineEmits<{
   (e: "update:limit", value: number): void;
   (e: "toggle-edit", id: string): void;
   (e: "submit-edit", employee: Employee): void;
+  (e: "delete-employee", id: string): void;
 }>();
 </script>
 
 <template>
   <section>
     <header
+      v-if="!isSmallScreen"
       class="grid grid-cols-[1fr_1fr_1fr_1fr_.5fr_.5fr_.5fr] justify-items-center"
     >
       <h6 v-for="info in employeeInfos" class="font-bold text-gray-800">
@@ -49,6 +54,7 @@ const emit = defineEmits<{
           :departmentFilters="departmentFilters"
           @toggle-edit="emit('toggle-edit', $event)"
           @submit-edit="emit('submit-edit', $event)"
+          @delete-employee="emit('delete-employee', $event)"
         />
         <ListItem
           v-else
@@ -57,7 +63,6 @@ const emit = defineEmits<{
         />
       </template>
     </ul>
-
     <Pagination
       :page="props.page"
       :limit="props.limit"
