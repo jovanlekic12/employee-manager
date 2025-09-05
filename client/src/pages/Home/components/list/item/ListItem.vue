@@ -28,15 +28,21 @@ const { employee } = toRefs(props);
     ]"
   >
     <p class="text-md font-medium text-gray-700">
-      <span class="mr-2 text-gray-900 font-bold">Full name:</span>
+      <span v-if="isSmallScreen" class="mr-2 text-gray-900 font-bold"
+        >Full name:</span
+      >
       {{ employee.full_name }}
     </p>
     <p class="text-md font-medium text-gray-700">
-      <span class="mr-2 text-gray-900 font-bold">Address:</span>
+      <span v-if="isSmallScreen" class="mr-2 text-gray-900 font-bold"
+        >Address:</span
+      >
       {{ employee.adress }}
     </p>
     <p class="text-md font-medium text-gray-700 self-start">
-      <span class="mr-2 text-gray-900 font-bold">Start date:</span>
+      <span v-if="isSmallScreen" class="mr-2 text-gray-900 font-bold"
+        >Start date:</span
+      >
       {{
         new Date(employee.start_date)
           .toLocaleDateString("en-US", {
@@ -48,16 +54,22 @@ const { employee } = toRefs(props);
       }}
     </p>
     <p class="text-md font-medium text-gray-700">
-      <span class="mr-2 text-gray-900 font-bold">Employment:</span>
+      <span v-if="isSmallScreen" class="mr-2 text-gray-900 font-bold"
+        >Employment:</span
+      >
 
       {{ employee.employment }}
     </p>
     <p class="text-md font-medium text-gray-700">
-      <span class="mr-2 text-gray-900 font-bold">Department:</span>
+      <span v-if="isSmallScreen" class="mr-2 text-gray-900 font-bold"
+        >Department:</span
+      >
       {{ employee.department }}
     </p>
     <div class="flex items-center gap-3">
-      <span class="text-gray-900 font-bold">Completed training:</span>
+      <span v-if="isSmallScreen" class="text-gray-900 font-bold"
+        >Completed training:</span
+      >
       <input
         type="checkbox"
         v-model="employee.training"

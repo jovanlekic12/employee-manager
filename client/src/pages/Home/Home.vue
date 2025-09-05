@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { getEmployees } from "@/api/employees";
 import apiClient from "@/api/apiClient";
-import type { Employee } from "@/utils/types";
+import { type User, type Employee } from "@/utils/types";
 import { onMounted, ref, watch } from "vue";
 import Header from "./components/header/Header.vue";
 import Sidebar from "./components/sidebar/Sidebar.vue";
@@ -9,6 +9,12 @@ import EmployeesList from "./components/list/EmployeesList.vue";
 import Overlay from "@/components/Overlay.vue";
 import Button from "@/components/Button.vue";
 import NewEmployeeForm from "./components/form/NewEmployeeForm.vue";
+import { useUserStore } from "@/store/auth";
+import router from "@/router";
+
+const userStore = useUserStore();
+
+const user = ref<User | undefined>(userStore.user);
 
 const page = ref(1);
 const limit = ref(6);
@@ -25,6 +31,11 @@ const activeEmployment = ref<string>("All");
 const activeDepartment = ref<string>("All");
 const employmentFilters = ref<string[]>([]);
 const departmentFilters = ref<string[]>([]);
+
+const handleLogOut = () => {
+  cookieStore.delete("access_token");
+  router.push("/log-in");
+};
 
 const fetchEmployees = async () => {
   const response = await getEmployees(
@@ -109,7 +120,18 @@ watch(
     <header class="w-full text-center py-5">
       <h1 class="text-4xl font-semibold text-gray-900">Employee Manager</h1>
     </header>
-    <Button type="primary" @click="isFormOpened = true">Add employee</Button>
+    <div class="flex justify-between">
+      <Button type="primary" @click="isFormOpened = true">Add employee</Button>
+      <div>
+        <h1 v-if="user?.isAdmin">Dashboard</h1>
+        <Button
+          type="primary"
+          class="bg-red-500 hover:bg-red-700"
+          @click="handleLogOut"
+          >Log out</Button
+        >
+      </div>
+    </div>
     <Header
       v-model:searchQuery="searchQuery"
       :total="total"

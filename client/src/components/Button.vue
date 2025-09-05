@@ -19,7 +19,8 @@ const base =
 
 const classes = computed(() => {
   const map: Record<ButtonType, string> = {
-    primary: base + " flex items-center gap-1 px-3 py-1.5 rounded-xl",
+    primary:
+      base + " flex items-center gap-1 px-3 py-1.5 rounded-xl justify-center",
     small: base + " px-4 py-2 md:px-5 md:py-2.5 text-xs",
     ghost: "bg-transparent cursor-pointer",
     round: base + " flex items-center justify-center w-9 h-9 rounded-[50%]",
