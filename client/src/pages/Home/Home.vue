@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { getEmployees } from "@/api/employees";
 import apiClient from "@/api/apiClient";
-import { type User, type Employee } from "@/utils/types";
+import { type Employee } from "@/utils/types";
 import { onMounted, ref, watch } from "vue";
 import Header from "./components/header/Header.vue";
 import Sidebar from "./components/sidebar/Sidebar.vue";
@@ -9,12 +9,13 @@ import EmployeesList from "./components/list/EmployeesList.vue";
 import Overlay from "@/components/Overlay.vue";
 import Button from "@/components/Button.vue";
 import NewEmployeeForm from "./components/form/NewEmployeeForm.vue";
-import { useUserStore } from "@/store/auth";
 import router from "@/router";
 
-const userStore = useUserStore();
+import { storeToRefs } from "pinia";
+import { useUserStore } from "@/store/auth";
 
-const user = ref<User | undefined>(userStore.user);
+const userStore = useUserStore();
+const { user } = storeToRefs(userStore);
 
 const page = ref(1);
 const limit = ref(6);
@@ -122,8 +123,13 @@ watch(
     </header>
     <div class="flex justify-between">
       <Button type="primary" @click="isFormOpened = true">Add employee</Button>
-      <div>
-        <h1 v-if="user?.isAdmin">Dashboard</h1>
+      <div class="flex gap-5 items-center">
+        <RouterLink
+          to="/dashboard"
+          v-if="user?.admin"
+          class="text-lg font-semibold text-blue-500 hover:underline"
+          >Dashboard</RouterLink
+        >
         <Button
           type="primary"
           class="bg-red-500 hover:bg-red-700"

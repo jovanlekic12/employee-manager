@@ -1,7 +1,6 @@
 import bcrypt from "bcrypt";
 import con from "../../index.js";
 import { jwtTokens } from "../../utils/jwt-helpers.js";
-import jwt from "jsonwebtoken";
 import { checkSchema, validationResult } from "express-validator";
 import { LogInValidationSchema } from "../../validation/LogInValidationSheme.js";
 

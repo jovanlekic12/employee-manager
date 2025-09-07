@@ -30,7 +30,7 @@ export type User = {
   full_name: string;
   email: string;
   password: string;
-  isAdmin: boolean;
+  admin: boolean;
 };
 
 export type Tokens = {

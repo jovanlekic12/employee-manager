@@ -1,7 +1,9 @@
 import { checkSchema, validationResult } from "express-validator";
 import con from "../../index.js";
-import { responseFactory, errorFactory } from "../../utils/helpers.js";
+import { errorFactory } from "../../utils/helpers.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
 import { NewUserValidationSchema } from "../../validation/NewUserValidation.js";
 import { jwtTokens } from "../../utils/jwt-helpers.js";
 const users = [];
@@ -74,6 +76,22 @@ users.push({
         }
 
         res.json(result.rows[0]);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    },
+  ],
+});
+
+users.push({
+  method: "get",
+  route: "/dashboard",
+  handler: [
+    authenticateToken,
+    async (req, res) => {
+      try {
+        const result = await con.query("SELECT * FROM users");
+        res.json(result.rows);
       } catch (error) {
         res.status(500).json({ error: error.message });
       }
