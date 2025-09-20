@@ -25,9 +25,9 @@ const handleLogin = async () => {
 
     axios.defaults.headers.common[
       "authorization"
-    ] = `Bearer ${data.accessToken}`;
+    ] = `Bearer ${data.refreshToken}`;
 
-    cookieStore.set("access_token", data.accessToken);
+    cookieStore.set("access_token", data.refreshToken);
 
     await router.push("/home");
   } catch (err) {
