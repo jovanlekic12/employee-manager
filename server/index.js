@@ -8,21 +8,24 @@ const app = express();
 dotenv.config();
 
 const con = new Client({
-  host: "localhost",
-  user: "postgres",
-  port: 9000,
-  password: "kuratiprogramer11",
-  database: "employees",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  port: process.env.DB_PORT,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
 
-con.connect().then(() => console.log("Postgres connected"));
+con
+  .connect()
+  .then(() => console.log("Postgres connected"))
+  .catch((err) => console.error("DB ERROR:", err));
 export default con;
 
 app.use(
   cors({
     origin: "http://localhost:5173",
     credentials: true,
-  })
+  }),
 );
 
 app.use(express.json());
