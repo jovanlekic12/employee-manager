@@ -18,7 +18,7 @@ const handleLogin = async () => {
 
   try {
     const { data } = await axios.post<Tokens>(
-      "http://localhost:3000/api/login",
+      "https://employee-manager-rr86.onrender.com/api/login",
       { email: email.value, password: password.value },
       { withCredentials: true },
     );
