@@ -41,6 +41,7 @@ const router = createRouter({
 
 router.beforeEach(async (to) => {
   const userStore = useUserStore();
+  // @ts-ignore
   const token = await cookieStore.get("access_token");
   const isAuthRoute = to.name === "LogIn" || to.name === "SignUp";
 
@@ -52,6 +53,7 @@ router.beforeEach(async (to) => {
       const user = await getUserData(token.value as string);
 
       if (!user) {
+        // @ts-ignore
         await cookieStore.delete("access_token");
         userStore.setUser(null);
         return { name: "LogIn" };
@@ -60,6 +62,7 @@ router.beforeEach(async (to) => {
       userStore.setUser(user);
     } catch (error) {
       console.error("Error fetching user:", error);
+      // @ts-ignore
       await cookieStore.delete("access_token");
       userStore.setUser(null);
       return { name: "LogIn" };

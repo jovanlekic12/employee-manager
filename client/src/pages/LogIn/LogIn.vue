@@ -20,13 +20,12 @@ const handleLogin = async () => {
     const { data } = await axios.post<Tokens>(
       "http://localhost:3000/api/login",
       { email: email.value, password: password.value },
-      { withCredentials: true }
+      { withCredentials: true },
     );
 
-    axios.defaults.headers.common[
-      "authorization"
-    ] = `Bearer ${data.refreshToken}`;
-
+    axios.defaults.headers.common["authorization"] =
+      `Bearer ${data.refreshToken}`;
+    // @ts-ignore
     cookieStore.set("access_token", data.refreshToken);
 
     await router.push("/home");

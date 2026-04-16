@@ -10,6 +10,7 @@ const userInfos = ["Full name", "Email", "Admin"];
 
 const fetchUsers = async () => {
   try {
+    // @ts-ignore
     const token = await cookieStore.get("access_token");
     if (!token) return;
     const result = await getUsers(token.value as string);

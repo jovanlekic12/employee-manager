@@ -34,6 +34,7 @@ const employmentFilters = ref<string[]>([]);
 const departmentFilters = ref<string[]>([]);
 
 const handleLogOut = () => {
+  // @ts-ignore
   cookieStore.delete("access_token");
   router.push("/log-in");
 };
@@ -45,7 +46,7 @@ const fetchEmployees = async () => {
     searchQuery.value,
     sort.value,
     activeEmployment.value,
-    activeDepartment.value
+    activeDepartment.value,
   );
   employees.value = response.data.map((employee) => {
     return { ...employee, isEditing: false };
@@ -72,7 +73,7 @@ const handleEditing = (id: string) => {
   employees.value = employees.value.map((employee: Employee) =>
     id === employee.id
       ? { ...employee, isEditing: !employee.isEditing }
-      : { ...employee, isEditing: false }
+      : { ...employee, isEditing: false },
   );
 };
 
@@ -97,7 +98,7 @@ const handleSubmitEdit = (newEmployee: Employee) => {
   employees.value = employees.value.map((employee) =>
     employee.id === newEmployee.id
       ? { ...employee, ...newEmployee, isEditing: false }
-      : employee
+      : employee,
   );
 };
 
@@ -112,7 +113,7 @@ onMounted(() => {
 
 watch(
   [page, limit, searchQuery, activeEmployment, activeDepartment, sort],
-  fetchEmployees
+  fetchEmployees,
 );
 </script>
 
